@@ -8,3 +8,5 @@ app.get('/', (req, res) => {
 app.listen(8085, () => {
   console.log('server running at 8085')
 })
+
+module.exports = app
