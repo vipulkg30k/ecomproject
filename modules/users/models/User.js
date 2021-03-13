@@ -10,6 +10,7 @@ const userSchema = mongoose.Schema({
   },
   email: {
     type: String,
+    lowercase: true,
     required: [true, 'Email is Required'],
     maxlength: [128, 'email can\'t be longer than128 characters'],
     index: true
