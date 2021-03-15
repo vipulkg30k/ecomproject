@@ -7,3 +7,5 @@ mongoose.connect('mongodb://localhost:27017/99Store', {
 mongoose.connection.once('open', () => {
   console.log('Connected to mongodb')
 })
+
+module.exports = mongoose.connection
