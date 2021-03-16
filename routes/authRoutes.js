@@ -60,7 +60,7 @@ router.post('/register', guestMiddleware, async (req, res) => {
  * Shows page for user login
  */
 router.get('/login', guestMiddleware, flasherMiddleware, (req, res) => {
-  return res.render('/login')
+  return res.render('login')
 })
 
 /**
