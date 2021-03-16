@@ -34,49 +34,74 @@ router.post('/register', guestMiddleware, async (req, res) => {
       }
       return res.redirect('/register')
     }
-    const user = await addUser(req.body)
+    await addUser(req.body)
     req.session.flashData = {
       message: {
         type: 'success',
         body: 'Registration success'
-      },
-      formData: req.body
+      }
     }
-    return res.redirect('register')
+    return res.redirect('/register')
   } catch (e) {
     console.error(e)
-    return res.status(400).render('register', {
+    req.session.flashData = {
       message: {
         type: 'error',
         body: 'Validation Error'
       },
       errors: mongooseErrorFormatter(e),
       formData: req.body
-    })
+    }
+    return res.redirect('/register')
   }
 })
 
 /**
  * Shows page for user login
  */
-router.get('/login', guestMiddleware, (req, res) => {
+router.get('/login', guestMiddleware, flasherMiddleware, (req, res) => {
   return res.render('login')
 })
 
 /**
  * Logs in a user
  */
-router.post('/login', guestMiddleware, passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login-failed'
-}),
-(req, res) => {
-  return res.render('login', {
-    message: {
-      type: 'success',
-      body: 'Login Success'
+router.post('/login', guestMiddleware, (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      console.log('Err:', err)
+      req.session.flashData = {
+        message: {
+          type: 'error',
+          body: 'Login Failed'
+        }
+      }
+      return res.redirect('/login')
     }
-  })
+
+    if (!user) {
+      req.session.flashData = {
+        message: {
+          type: 'error',
+          body: info.error
+        }
+      }
+      return res.redirect('/login')
+    }
+
+    req.logIn(user, (err) => {
+      if (err) {
+        console.log('Err:', err)
+        req.session.flashData = {
+          message: {
+            type: 'error',
+            body: 'Login Failed'
+          }
+        }
+      }
+      return res.redirect('/homepage')
+    })
+  })(req, res, next)
 })
 
 /**
@@ -84,7 +109,13 @@ router.post('/login', guestMiddleware, passport.authenticate('local', {
  */
 router.get('/logout', authMiddleware, (req, res) => {
   req.logOut()
-  res.redirect('/')
+  req.session.flashData = {
+    message: {
+      type: 'success',
+      body: 'Login Success'
+    }
+  }
+  return res.redirect('/')
 })
 
 module.exports = router
