@@ -1,6 +1,7 @@
 const express = require('express')
 const session = require('express-session')
 const bodyParser = require('body-parser')
+const logger = require('morgan')
 require('./utils/db.config')
 const MongoStore = require('connect-mongo')(session)
 const mongoDbConnection = require('./utils/db.config')
@@ -21,6 +22,7 @@ app.use(session({
   cookie: { secure: false },
   store: new MongoStore({ mongooseConnection: mongoDbConnection })
 }))
+app.use(logger('dev'))
 app.use(passport.initialize())
 app.use(passport.session())
 // { message: {}, formData: {}, errors: {} }
