@@ -32,7 +32,7 @@ describe('Make sure register fails on no data', () => {
 })
 
 describe('Make sure register is successfull with valid data', () => {
-  const email = `vipul.${new Date().getTime()}@example.com`
+  const email = `Vipul.${new Date().getTime()}@example.com`
   it('should return success in respones', (done) => {
     const agent = chai.request.agent(app)
     agent
