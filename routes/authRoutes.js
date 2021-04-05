@@ -1,74 +1,121 @@
-const chai = require('chai')
-const chaiHttp = require('chai-http')
-const app = require('../index')
+const express = require('express')
+const router = express.Router()
+const { addUser } = require('../modules/users/service/userService')
+const { registerSchema } = require('../modules/users/validations/authValidation')
+const { joiErrorFormatter, mongooseErrorFormatter } = require('../utils/validationFormatter')
+const passport = require('passport')
+const guestMiddleware = require('../middlewares/guestMiddleware')
+const authMiddleware = require('../middlewares/authMiddleware')
+const flasherMiddleware = require('../middlewares/flasherMiddleware')
 
-// Configure chai
-chai.use(chaiHttp)
-chai.should()
-
-describe('Make sure server is returning registration page', () => {
-  it('should return a page with status 200', (done) => {
-    chai.request(app)
-      .get('/register')
-      .end((err, res) => {
-        if (err) return done(err)
-        res.should.have.status(200)
-        done()
-      })
-  })
+/**
+ * Shows page for user registration
+ */
+router.get('/register', guestMiddleware, flasherMiddleware, (req, res) => {
+  return res.render('register')
 })
 
-describe('Make sure register fails on no data', () => {
-  it('should return validation errors', (done) => {
-    const agent = chai.request.agent(app)
-    agent
-      .post('/register')
-      .end((err, res) => {
-        if (err) return done(err)
-        res.text.should.contain('Validation Errors')
-        done()
-      })
-  })
+/**
+ * Handles user registration
+ */
+router.post('/register', guestMiddleware, async (req, res) => {
+  try {
+    const validationResult = registerSchema.validate(req.body, {
+      abortEarly: false
+    })
+    if (validationResult.error) {
+      req.session.flashData = {
+        message: {
+          type: 'error',
+          body: 'Validation Errors'
+        },
+        errors: joiErrorFormatter(validationResult.error),
+        formData: req.body
+      }
+      return res.redirect('/register')
+    }
+    await addUser(req.body)
+    req.session.flashData = {
+      message: {
+        type: 'success',
+        body: 'Registration success'
+      }
+    }
+    return res.redirect('/register')
+  } catch (e) {
+    req.session.flashData = {
+      message: {
+        type: 'error',
+        body: 'Validation Errors'
+      },
+      errors: mongooseErrorFormatter(e),
+      formData: req.body
+    }
+    return res.redirect('/register')
+  }
 })
 
-describe('Make sure register is successfull with valid data', () => {
-  const email = `vipul.${new Date().getTime()}@example.com`
-  it('should return success in respones', (done) => {
-    const agent = chai.request.agent(app)
-    agent
-      .post('/register')
-      .type('form')
-      .send({
-        email,
-        name: 'Vipul',
-        password: '12345678',
-        repeat_password: '12345678'
-      })
-      .end((err, res) => {
-        if (err) return done(err)
-        res.should.have.status(200)
-        res.text.should.not.contain('Validation Errors')
-        done()
-      })
-  })
-
-  it('should return validation error about unique email', (done) => {
-    const agent = chai.request.agent(app)
-    agent
-      .post('/register')
-      .type('form')
-      .send({
-        email,
-        name: 'Vipul',
-        password: '12345678',
-        repeat_password: '12345678'
-      })
-      .end((err, res) => {
-        if (err) return done(err)
-        res.should.have.status(200)
-        res.text.should.contain('Email already exists')
-        res.text.should.contain('Validation Errors')
-        done()
-      })
-  })
+/**
+ * Shows page for user login
+ */
+router.get('/login', guestMiddleware, flasherMiddleware, (req, res) => {
+  return res.render('login')
 })
+
+/**
+ * Logs in a user
+ */
+router.post('/login', guestMiddleware, (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    console.log(err, user, info)
+    if (err) {
+      console.error('Err:', err)
+      req.session.flashData = {
+        message: {
+          type: 'error',
+          body: 'Login failed'
+        }
+      }
+      return res.redirect('/login')
+    }
+
+    if (!user) {
+      req.session.flashData = {
+        message: {
+          type: 'error',
+          body: info.message
+        }
+      }
+      return res.redirect('/login')
+    }
+
+    req.logIn(user, (err) => {
+      if (err) {
+        console.error('Err:', err)
+        req.session.flashData = {
+          message: {
+            type: 'error',
+            body: 'Login failed'
+          }
+        }
+      }
+      return res.redirect('/homepage')
+    })
+  })(req, res, next)
+})
+
+/**
+ * Logs out a user
+ */
+router.get('/logout', authMiddleware, (req, res) => {
+  req.logout()
+  req.session.flashData = {
+    message: {
+      type: 'success',
+      body: 'Logout success'
+    }
+  }
+  return res.redirect('/')
+})
+
+module.exports = router
