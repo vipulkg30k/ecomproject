@@ -6,17 +6,19 @@
   "scripts": {
     "serve:local": "nodemon index.js",
     "test": "mocha tests/*.js --exit",
-    "lint:fix": "eslint --fix ./*.js",
-    "lint": "eslint  ./*.js"
+    "test:chrome": "node test_browser/index.js",
+    "lint": "eslint  ./*.js",
+    "lint:fix": "eslint --fix ./*.js"
   },
-  "keywords": [],
+  "keywords": [
+    "ecommerce"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
-    "chai": "^4.3.4",
     "connect-mongo": "^3.2.0",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
@@ -27,9 +29,11 @@
     "morgan": "^1.10.0",
     "npm": "^6.14.8",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
     "chai-http": "^4.3.0",
     "eslint": "^7.21.0",
     "eslint-config-standard": "^16.0.2",
@@ -37,6 +41,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "mocha": "^8.3.1",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "puppeteer-core": "^3.3.0"
   }
 }

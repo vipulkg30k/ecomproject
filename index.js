@@ -15,7 +15,7 @@ const app = express()
 const config = require('./utils/config')
 
 app.use(bodyParser.urlencoded({ extended: false }))
-app.set('view engine', 'ejs')
+app.set('view engine', 'pug')
 // app.set('trust proxy', 1)
 app.use(
   session({
@@ -43,7 +43,7 @@ app.get('/', authMiddleware, (req, res) => {
 })
 
 app.get('/homepage', authMiddleware, (req, res) => {
-  res.send(`welcome ${req.user.name}`)
+  res.render('dashboard')
 })
 
 app.use((req, res, next) => {
