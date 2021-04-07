@@ -13,6 +13,7 @@ const authMiddleware = require('./middlewares/authMiddleware')
 const authRoutes = require('./routes/authRoutes')
 const app = express()
 const config = require('./utils/config')
+const flasherMiddleware = require('./middlewares/flasherMiddleware')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.set('view engine', 'pug')
@@ -47,7 +48,7 @@ app.locals.errors = {} // form validation errors
 
 app.use('/', authRoutes)
 
-app.get('/', authMiddleware, (req, res) => {
+app.get('/', flasherMiddleware, (req, res) => {
   console.log('User:', req.user)
   return res.render('index')
 })
