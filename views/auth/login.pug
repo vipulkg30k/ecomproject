@@ -1,4 +1,4 @@
-extends partials/layout
+extends ../master/default/layout
 block content
   .container.mt-5
     h1 Login
@@ -30,5 +30,4 @@ block content
           required
         )
         +err(errors.password)
-
       button#submit.btn.btn-primary(type='submit') Submit

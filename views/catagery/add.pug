@@ -1,14 +1,14 @@
-extends partials/layout
+extends ../partials/layout
 block content
   .container.mt-5
-    h1 Registration
+    h1 Add Category
     +alert(message)
 
     form#registerForm(method='POST' action='/register')
       .form-group
         label(for='name')
           | Name
-          sup.text-danger *
+          sup.text-categoryRoutesnger *
         input#name.form-control(
           class=errors.name ? 'is-invalid': '',
           value=formData.name,

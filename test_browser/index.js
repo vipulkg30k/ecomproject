@@ -5,8 +5,8 @@ const config = require('../utils/config')
 /**
  * Base url, may change if you want to test live system
  */
-const baseUrl = `http://127.0.0.1:${config.port}`
-const sleepTime = 1
+const baseUrl = `http://localhost:${config.port}`
+const sleepTime = 3000
 const slowMoTime = 1
 
 /**
@@ -137,5 +137,4 @@ const testInAllScreenSizes = async () => {
   }
   process.exit(0)
 }
-
 testInAllScreenSizes()
