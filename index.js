@@ -53,7 +53,7 @@ app.get('/', flasherMiddleware, (req, res) => {
   return res.render('pages/homepage')
 })
 
-app.get('/homepage', authMiddleware, (req, res) => {
+app.get('/dashboard', authMiddleware, (req, res) => {
   return res.render('dashboard/dashboard')
 })
 
