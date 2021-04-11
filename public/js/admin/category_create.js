@@ -76,7 +76,11 @@ const app = new Vue({
           label: 'PB',
           printLabel: 'PB'
         }],
-        filterChoices: [],
+        filterChoices: [{
+          label: '1 GB',
+          value: '1 GB',
+          type: 'eq'
+        }],
         input: {
           type: 'fractionalNumber',
           propertyChoices: []
@@ -84,7 +88,7 @@ const app = new Vue({
       }, {
         name: 'RAM',
         required: true,
-        filterable: true,
+        filterable: false,
         input: {
           type: 'fractionalNumber',
           propertyChoices: []
@@ -114,12 +118,17 @@ const app = new Vue({
 
   methods: {
     saveCategory: function () {
-      console.log(this.category)
+      console.log(JSON.stringify(this.category))
+      axios.post('/api/v1/category', this.category)
+        .then(result => {
+          console.log(result)
+          console.log(result.data)
+        })
     },
 
     // Property methods
     addNewProperty: function () {
-      this.category.properties.push({
+      const categoryObject = {
         name: '',
         required: true,
         filterChoices: [],
@@ -128,7 +137,8 @@ const app = new Vue({
           type: 'fractionalNumber',
           propertyChoices: []
         }
-      })
+      }
+      this.category.properties.push(categoryObject)
     },
 
     removeProperty: function (index) {
@@ -142,10 +152,7 @@ const app = new Vue({
         value: ''
       }
 
-      if (Array.isArray(property.input.propertyChoices)) {
-        return property.input.propertyChoices.push(choiceObject)
-      }
-      property.input.propertyChoices = [choiceObject]
+      property.input.propertyChoices.push(choiceObject)
     },
 
     removeChoice: function (index, property) {
@@ -153,7 +160,7 @@ const app = new Vue({
     },
 
     // Units
-    addUnit (property) {
+    addUnit: function (property) {
       const unitObject = {
         label: '',
         printLabel: '',
@@ -161,10 +168,7 @@ const app = new Vue({
         nextLabel: ''
       }
 
-      if (Array.isArray(property.units)) {
-        return property.units.push(unitObject)
-      }
-      property.units = [unitObject]
+      property.units.push(unitObject)
     },
 
     removeUnit: function (index, units) {
@@ -172,16 +176,13 @@ const app = new Vue({
     },
 
     // Filters
-    addFilter (property) {
+    addFilter: function (property) {
       const filterObject = {
         label: '',
         printLabel: '',
         type: ''
       }
-      if (Array.isArray(property.filterChoices)) {
-        return property.filterChoices.push(filterObject)
-      }
-      property.filterChoices = [filterObject]
+      property.filterChoices.push(filterObject)
     },
 
     removeFilter: function (index, property) {
